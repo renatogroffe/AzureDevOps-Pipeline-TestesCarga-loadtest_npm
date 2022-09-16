@@ -1,0 +1,33 @@
+# Para saber mais sobre testes de carga com o pacote npm loadtest acesse:
+# https://www.npmjs.com/package/loadtest
+
+trigger:
+- main
+
+resources:
+- repo: self
+
+variables:
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+  endpoint: 'ENDPOINT HTTP/HTTPS'
+  concurrentUsers: 70
+  totalRequests: 5000
+
+stages:
+- stage: LoadTests
+  displayName: LoadTests stage
+  jobs:
+  - job: LoadTests
+    displayName: Testes de carga com o pacote npm loadtest
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - script: |
+        npm install loadtest
+        npx loadtest --help
+      displayName: Instalar package loadtest
+    - script: |
+        npx loadtest -c $(concurrentUsers) -n $(totalRequests) -k $(endpoint)
+      displayName: Executar testes com o package loadtest
